@@ -15,22 +15,22 @@ import {
   getMessages,
   getConversations
 } from '../lib/api';
-import type { Message, Conversation } from '../types/chat.types'; // Agent type is part of AgentCategory now
-import { AGENT_CATEGORIES, ALL_AGENTS, DEFAULT_AGENT_ID } from '../lib/agents.config'; // Import new structures
-import useMediaQuery from '../hooks/useMediaQuery'; // Import the hook
+import type { Message, Conversation } from '../types/chat.types';
+import { AGENT_CATEGORIES, ALL_AGENTS, DEFAULT_AGENT_ID } from '../lib/agents.config';
+import useMediaQuery from '../hooks/useMediaQuery';
 
 const ChatPage: React.FC = () => {
-  const isMobile = useMediaQuery('(max-width: 767px)'); // Add this line
+  const isMobile = useMediaQuery('(max-width: 767px)');
   const [user, setUser] = useState<User | null>(null);
   const [currentAgentId, setCurrentAgentId] = useState<string>(DEFAULT_AGENT_ID);
-  const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(true);
-  const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(true);
+  const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(!isMobile);
+  const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(!isMobile);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleSignOut = async () => { // Define handleSignOut here
+  const handleSignOut = async () => {
     await supabase.auth.signOut();
   };
 
@@ -53,7 +53,7 @@ const ChatPage: React.FC = () => {
   useEffect(() => {
     // Close sidebars on initial mobile load if both are set to open by default
     if (isMobile) {
-      setIsLeftSidebarOpen(false); // Or true, depending on desired default for mobile
+      setIsLeftSidebarOpen(false);
       setIsRightSidebarOpen(false);
     }
   }, [isMobile]);
@@ -164,7 +164,7 @@ const ChatPage: React.FC = () => {
   const handleSendMessage = async (content: string) => {
     if (!user || isProcessing || !currentAgentId) return;
     
-    const selectedAgent = ALL_AGENTS.find(agent => agent.id === currentAgentId); // Use ALL_AGENTS
+    const selectedAgent = ALL_AGENTS.find(agent => agent.id === currentAgentId);
     if (!selectedAgent) {
       console.error("Selected agent not found");
       setMessages(prev => [
@@ -258,7 +258,7 @@ const ChatPage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-white">
+    <div className="flex flex-col h-screen bg-gray-50">
       <Header 
         user={user} 
         onToggleLeftSidebar={toggleLeftSidebar}
@@ -267,22 +267,27 @@ const ChatPage: React.FC = () => {
       
       <div className="flex flex-1 overflow-hidden">
         {/* Left Sidebar - Conversations */}
-        <div className={`transition-all duration-300 ease-in-out flex-shrink-0 overflow-hidden ${isLeftSidebarOpen ? 'w-64 translate-x-0' : 'w-0 -translate-x-full'}`}
+        <div 
+          className={`
+            fixed md:relative inset-y-0 left-0 z-30 w-80 transform transition-transform duration-300 ease-in-out
+            ${isLeftSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+            ${isMobile ? 'md:w-80' : 'w-80'}
+          `}
         >
           {user && (
             <ChatHistory
-              user={user} // Pass user
+              user={user}
               conversations={conversations}
               currentConversationId={currentConversationId}
               onSelectConversation={selectConversation}
               onNewConversation={handleNewConversation}
-              onSignOut={handleSignOut} // Pass handleSignOut
+              onSignOut={handleSignOut}
             />
           )}
         </div>
         
         {/* Main Chat Area */}
-        <main className="flex-1 overflow-hidden flex flex-col">
+        <main className="flex-1 overflow-hidden flex flex-col relative">
           <ChatContainer
             messages={messages}
             onSendMessage={handleSendMessage}
@@ -291,16 +296,32 @@ const ChatPage: React.FC = () => {
         </main>
 
         {/* Right Sidebar - Agents */}
-        <div className={`transition-all duration-300 ease-in-out flex-shrink-0 overflow-hidden ${isRightSidebarOpen ? 'w-72 translate-x-0' : 'w-0 translate-x-full'}`}
+        <div 
+          className={`
+            fixed md:relative inset-y-0 right-0 z-30 w-80 transform transition-transform duration-300 ease-in-out
+            ${isRightSidebarOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'}
+            ${isMobile ? 'md:w-80' : 'w-80'}
+          `}
         >
           {user && (
             <AgentSidebar
-              agentCategories={AGENT_CATEGORIES} // Pass categories
+              agentCategories={AGENT_CATEGORIES}
               currentAgentId={currentAgentId}
               onSelectAgent={handleSelectAgent}
             />
           )}
         </div>
+
+        {/* Mobile Overlay */}
+        {isMobile && (isLeftSidebarOpen || isRightSidebarOpen) && (
+          <div 
+            className="fixed inset-0 bg-black/20 z-20 md:hidden"
+            onClick={() => {
+              setIsLeftSidebarOpen(false);
+              setIsRightSidebarOpen(false);
+            }}
+          />
+        )}
       </div>
     </div>
   );
