@@ -1,5 +1,5 @@
-import type React from 'react';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import type { User } from '@supabase/supabase-js';
 import { v4 as uuidv4 } from 'uuid';
 import Header from '../components/Header';
@@ -51,7 +51,6 @@ const ChatPage: React.FC = () => {
   };
 
   useEffect(() => {
-    // Close sidebars on initial mobile load if both are set to open by default
     if (isMobile) {
       setIsLeftSidebarOpen(false);
       setIsRightSidebarOpen(false);
@@ -315,7 +314,7 @@ const ChatPage: React.FC = () => {
         {/* Mobile Overlay */}
         {isMobile && (isLeftSidebarOpen || isRightSidebarOpen) && (
           <div 
-            className="fixed inset-0 bg-black/20 z-20 md:hidden"
+            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-20 md:hidden"
             onClick={() => {
               setIsLeftSidebarOpen(false);
               setIsRightSidebarOpen(false);
