@@ -29,23 +29,21 @@ const AgentSidebar: React.FC<AgentSidebarProps> = ({
   onSelectAgent,
 }) => {
   return (
-    <div className="flex flex-col h-full bg-white/80 backdrop-blur-lg border-l border-gray-100">
+    <div className="flex flex-col h-full bg-white">
       {/* Header */}
-      <div className="p-5 border-b border-gray-100">
-        <h2 className="text-xl font-semibold bg-gradient-to-br from-gray-900 to-gray-700 bg-clip-text text-transparent">
-          AI Agents
-        </h2>
-        <p className="text-[15px] text-gray-500 mt-1">Choose an assistant for your task</p>
+      <div className="p-4 border-b border-gray-100">
+        <h2 className="text-lg font-semibold text-gray-900">AI Agents</h2>
+        <p className="text-sm text-gray-500 mt-0.5">Choose an assistant for your task</p>
       </div>
       
       {/* Agent Categories */}
       <div className="flex-1 overflow-y-auto py-4">
         {agentCategories.map((category) => (
           <div key={category.name} className="mb-6 last:mb-0">
-            <h3 className="px-5 text-xs font-medium text-gray-500 tracking-wider uppercase mb-3">
+            <h3 className="px-4 text-xs font-medium text-gray-500 tracking-wider uppercase mb-2">
               {category.name}
             </h3>
-            <div className="space-y-2 px-3">
+            <div className="space-y-1 px-2">
               {category.agents.map((agent) => {
                 const IconComponent = agent.iconName ? getLucideIcon(agent.iconName) : null;
                 const isActive = agent.id === currentAgentId;
@@ -54,15 +52,18 @@ const AgentSidebar: React.FC<AgentSidebarProps> = ({
                   <button
                     key={agent.id}
                     onClick={() => onSelectAgent(agent.id)}
-                    className={`w-full flex items-center gap-4 p-3.5 rounded-xl transition-all duration-300
+                    className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200
                       ${isActive 
                         ? 'bg-orange-50/80 hover:bg-orange-50' 
                         : 'hover:bg-gray-50/80'
                       }`}
                   >
                     {/* Agent Icon/Image */}
-                    <div className={`w-14 h-14 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0
-                      transition-colors duration-300 ${isActive ? 'bg-orange-100' : 'bg-gray-100'}`}
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0
+                      ${isActive
+                        ? 'bg-orange-100'
+                        : 'bg-gray-100'
+                      }`}
                     >
                       {agent.imageUrl ? (
                         <img 
@@ -72,21 +73,21 @@ const AgentSidebar: React.FC<AgentSidebarProps> = ({
                         />
                       ) : IconComponent ? (
                         <IconComponent 
-                          size={26} 
-                          className={`transition-colors duration-300 ${isActive ? 'text-orange-600' : 'text-gray-500'}`} 
+                          size={24} 
+                          className={isActive ? 'text-orange-600' : 'text-gray-500'} 
                         />
                       ) : (
                         <Bot 
-                          size={26} 
-                          className={`transition-colors duration-300 ${isActive ? 'text-orange-600' : 'text-gray-500'}`} 
+                          size={24} 
+                          className={isActive ? 'text-orange-600' : 'text-gray-500'} 
                         />
                       )}
                     </div>
 
                     {/* Agent Info */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h4 className={`text-[15px] font-medium truncate transition-colors duration-300
+                      <div className="flex items-center gap-2">
+                        <h4 className={`text-sm font-medium truncate
                           ${isActive ? 'text-orange-900' : 'text-gray-900'}`}>
                           {agent.name}
                         </h4>
@@ -95,7 +96,7 @@ const AgentSidebar: React.FC<AgentSidebarProps> = ({
                         )}
                       </div>
                       {agent.tagline && (
-                        <p className="text-sm text-gray-500 truncate">
+                        <p className="text-xs text-gray-500 mt-0.5 truncate">
                           {agent.tagline}
                         </p>
                       )}
